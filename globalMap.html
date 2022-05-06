@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>世界地图</title>
+    <style>
+        html,
+        body {
+            padding: 0;
+            margin: 0;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .echarts-map {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="echarts-map">
+        <!-- <div style="background-color: blue;">111</div> -->
+        <div class="echarts-map-box" id="echartsMapBox" style="width: 100%;height: 100%"></div>
+        <script src="utils/jquery.js"></script>
+        <script type="text/javascript" src="utils/echarts.min.js"></script>
+        <script type="text/javascript" src="utils/world.js"></script>
+        <script type="text/javascript" src="utils/worldMapNames.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                repRegionStrategy();
+            })
+
+            var pRChart = echarts.init(document.getElementById('echartsMapBox'));
+            function repRegionStrategy () {
+                $.get('utils/world.json', function (worldJson) {
+
+                echarts.registerMap('world', worldJson); // 注册地图
+                var option = {
+                    title: {
+                        text: '全球项目情况',
+                        left: 'center',
+                        textStyle: {
+                            color: 'white'
+                        },
+                        top: 'top'
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: function (params) {
+                            var value = params.value + '';
+                            return params.seriesName + '<br/>' + params.name + ' : ' + value + '个';
+                        }
+                    },
+                    visualMap: {
+                        min: 0,
+                        max: 1000000,
+                        text: ['High', 'Low'],
+                        show: false,
+                        realtime: false,
+                        calculable: false,
+                        textStyle: {
+                            color: 'white'
+                        },
+                        color: ['#0a9515']
+                    },
+                    series: [{
+                        name: '项目数量',
+                        type: 'map',
+                        mapType: 'world',
+                        roam: true,
+                        label: {
+                            normal: {
+                                show: true,
+                                textStyle: {
+                                    color: '#fff'
+                                },
+                                formatter: function (v) {
+                                    if (v.value > 1) {
+                                        return v.name + v.data.value + '个'
+                                    } else {
+                                        return ' '
+                                    }
+
+                                }
+                            },
+                            emphasis: {//鼠标放上去时的状态
+                                show: true,
+                                textStyle: {
+                                    color: '#fff'
+                                }
+                            }
+                        },
+                        itemStyle: {
+                            normal: {
+                                areaColor: '#d5d5d5',
+                                borderColor: 'rgb(0,108,255)',
+                            },
+                            emphasis: {
+                                label: {
+                                    show: true,
+                                    color: 'black'
+                                },
+                                areaColor: '#ffdf33'
+                            }
+                        },
+                        nameMap: nameMap,
+                    }]
+                }
+                pRChart.setOption(option, true);
+            })
+                var virus = []
+                $.ajax({
+                    url: 'https://api.inews.qq.com/newsqa/v1/automation/foreign/country/ranklist',
+                    type: 'get',
+                    dataType: 'json',
+                    success: function (data) {
+                        var num = data.data
+                        for (var i = 0; i < num.length; i++) {
+                            virus.push({ name: num[i].name, value: num[i].confirm })
+                        }
+                        //必须在这里在设置一遍，这里涉及到的问题不太懂，只知道如不再设置，而在ajax外赋值是没有作用的
+                        pRChart.setOption({ //加载数据图表
+                            series: [{
+                                // 根据名字对应到相应的系列
+                                data: virus
+                            }]
+                        })
+                    }
+                })
+            }
+            window.addEventListener('resize', function () {
+                pRChart.resize()
+            })
+            pRChart.on('click', params => {
+                console.log(params);
+            })
+        </script>
+    </div>
+</body>
+
+</html>
