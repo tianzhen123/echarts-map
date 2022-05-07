@@ -126,7 +126,6 @@
                         for (var i = 0; i < num.length; i++) {
                             virus.push({ name: num[i].name, value: num[i].confirm })
                         }
-                        //必须在这里在设置一遍，这里涉及到的问题不太懂，只知道如不再设置，而在ajax外赋值是没有作用的
                         pRChart.setOption({ //加载数据图表
                             series: [{
                                 // 根据名字对应到相应的系列
