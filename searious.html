@@ -29,14 +29,105 @@
     <div class="echarts-map">
         <!-- <div style="background-color: blue;">111</div> -->
         <div class="echarts-map-box" id="echartsMapBox" style="width: 100%;height: 100%"></div>
-        <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.5.1.min.js"></script>
+        <script src="utils/jquery.js"></script>
         <script type="text/javascript" src="utils/echarts.min.js"></script>
         <script type="text/javascript" src="utils/china.js"></script>
         <script type="text/javascript">
             $(document).ready(function () {
                 repRegionStrategy();
             })
+            var option2 = {
+                backgroundColor: '#565670',//地图背景色
+                series: [
+                    {
+                        name: '大区',//城市
+                        type: 'map',
+                        map: 'china',
+                        geoIndex: 1,
+                        aspectScale: 0.75, //长宽比
+                        symbolSize: 20,
+                        // data: data,
+                        showLegendSymbol: true, // 存在legend时显示
+                        label: {
+                            normal: {
+                                show: true,
+                                textStyle: {
+                                    color: '#fff'
+                                },
+                                formatter: function (v) {
+                                    if (v.value > 1) {
+                                        return v.name + v.data.count + '个'
+                                    } else {
+                                        return ' '
+                                    }
+
+                                }
+                            },
+                            emphasis: {//鼠标放上去时的状态
+                                show: true,
+                                textStyle: {
+                                    color: '#fff'
+                                }
+                            }
+                        },
+                        roam: true,//禁止拖拽和伸缩
+                        itemStyle: {
+                            normal: {
+                                areaColor: '#d5d5d5',
+                                borderColor: '#d5d5d5',
+                                borderWidth: 0.5
+                            },
+                            emphasis: {
+                                areaColor: '#ffdf33'
+                            }
+                        },
+                        data: [
+                            { name: '北京', value: 1, count: 5 },
+                            { name: '上海', value: 1, count: 5 },
+                            { name: '天津', value: 1, count: 5 },
+                            { name: '重庆', value: 1, count: 5 },
+                            { name: '河北', value: 1, count: 5 },
+                            { name: '河南', value: 1, count: 5 },
+                            { name: '云南', value: 2, count: 5 },
+                            { name: '辽宁', value: 2, count: 5 },
+                            { name: '黑龙江', value: 2, count: 5 },
+                            { name: '湖南', value: 3, count: 5 },
+                            { name: '安徽', value: 3, count: 5 },
+                            { name: '山东', value: 3, count: 5 },
+                            { name: '新疆', value: 1, count: 5 },
+                            { name: '江苏', value: 1, count: 5 },
+                            { name: '浙江', value: 1, count: 5 },
+                            { name: '江西', value: 1, count: 5 },
+                            { name: '湖北', value: 1, count: 5 },
+                            { name: '广西', value: 1, count: 5 },
+                            { name: '甘肃', value: 1, count: 5 },
+                            { name: '山西', value: 2, count: 5 },
+                            { name: '内蒙古', value: 2, count: 5 },
+                            { name: '陕西', value: 2, count: 5 },
+                            { name: '吉林', value: 2, count: 5 },
+                            { name: '福建', value: 2, count: 5 },
+                            { name: '贵州', value: 2, count: 5 },
+                            { name: '广东', value: 2, count: 5 },
+                            { name: '青海', value: 2, count: 5 },
+                            { name: '西藏', value: 2, count: 5 },
+                            { name: '四川', value: 2, count: 5 },
+                            { name: '宁夏', value: 1, count: 5 },
+                            { name: '海南', value: 1, count: 5 },
+                            { name: '台湾', value: 1, count: 5 },
+                            { name: '香港', value: 1, count: 5 },
+                            { name: '澳门', value: 1, count: 5 }
+                        ] //各省地图颜色数据依赖value
+                    }],
+                dataRange: {
+                    splitList: [
+                        { start: 1, end: 1, color: '#d7d7d7' },
+                        { start: 2, end: 2, color: '#a5a5a5' },
+                        { start: 3, end: 3, color: '#0a9515' },
+                    ]
+                },
+            };
             var mergeProvinces = function (chinaJson, names, properties) {//合并大区里省份的coordinates
+                let res = chinaJson
                 var features = chinaJson.features;
                 var polygons = [];
                 var polygons2 = [];
@@ -109,35 +200,17 @@
                     // 将新的合并区域添加到地图中
                     features.push(feature);
                 }
-                chinaJson.features = features;
+                res.features = features;
+                return res
 
             };
 
-            function colorAreaObj (name, color, value) {
-                this.name = name;
-                this.value = value;
-                this.itemStyle = {
-                    normal: {
-                        color: color,
-                        show: false,
-                    },
-                    emphasis: {
-                        color: color,
-                        show: false,
-                    },
-                };
-                this.label = {
-                    normal: {
-                        show: true,
-                    },
-                    emphasis: {
-                        show: true,
-                    },
-                };
-            }
             var pRChart = echarts.init(document.getElementById('echartsMapBox'));
+            var cj;
             function repRegionStrategy () {
                 $.get('utils/china.json', function (chinaJson) {
+                    cj = chinaJson;
+                    let copyJson = JSON.parse(JSON.stringify(chinaJson))
                     var params = {
                         names: [//把各个大区的省份用二维数组分开
                             ['北京', '天津', '河北', '山西', '内蒙古'],
@@ -163,70 +236,165 @@
                         }
                     };
 
-                    mergeProvinces(chinaJson, params.names, params.properties);
+                    let res = mergeProvinces(copyJson, params.names, params.properties);
 
-                    echarts.registerMap('china', chinaJson); // 注册地图
-                    
+                    echarts.registerMap('china', res); // 注册地图
 
+
+                    var data = [//地图数据
+                        {
+                            "name": "华北",
+                            "value": 2,
+                        },
+                        {
+                            "name": "东北区域",
+                            "value": 100,
+                        },
+                        {
+                            "name": "华南",
+                            "value": 6,
+                        },
+                        {
+                            "name": "华东",
+                            "value": 7,
+                        },
+                        {
+                            "name": "华中",
+                            "value": 1,
+                        },
+                        {
+                            "name": "西南",
+                            "value": 8,
+                        },
+                        {
+                            "name": "西北",
+                            "value": 5,
+                        }
+                    ];
+                    function colorAreaObj (name, color, value) {
+                        this.name = name;
+                        this.value = value;
+                        this.itemStyle = {
+                            normal: {
+                                color: color,
+                                show: false,
+                            },
+                            emphasis: {
+                                color: color,
+                                show: false,
+                            },
+                        };
+                        this.label = {
+                            normal: {
+                                show: true,
+                            },
+                            emphasis: {
+                                show: true,
+                            },
+                        };
+                    }
                     var colorAreaConfig = [//地图数据
                         {
                             "name": "东北区域",
                             "color": '#e400ff',
-                            "value":20,
+                            "value": 20,
                         },
                         {
                             "name": "华北",
                             "color": "rgba(47,144,236,1)",
-                            "value":2,
+                            "value": 2,
                         },
                         {
                             "name": "华南",
                             "color": "#2525d7",
-                            "value":6,
+                            "value": 6,
                         },
                         {
                             "name": "华东",
                             "color": "rgba(254,62,62,1)",
-                            "value":7,
+                            "value": 7,
                         },
                         {
                             "name": "华中",
                             "color": "rgba(176,58,91,1)",
-                            "value":1,
+                            "value": 1,
                         },
                         {
                             "name": "西南",
                             "color": "#ee9a00",
-                            "value":8,
+                            "value": 8,
                         },
                         {
                             "name": "西北",
                             "color": "#a5a279",
-                            "value":5,
+                            "value": 5,
                         }
                     ];
+
                     data = colorAreaConfig.map(function (v, i) {
-                        return new colorAreaObj(v.name, v.color,v.value);
+                        return new colorAreaObj(v.name, v.color, v.value);
                     });
 
+                    function converData (data) {
+                        let ing = [[116.24, 39.54],
+                        [126.32, 43.50],
+                        [119.28, 31.13],
+                        [114.20, 30.32],
+                        [113.15, 23.08],
+                        [104.04, 29.39],
+                        [103.49, 36.03]]
+                        let res = []
+                        for (let i = 0; i < data.length; i++) {
+                            res.push({
+                                name: data[i].name,
+                                value: ing[i].concat(data[i].value)
+                            })
+                        }
+                        return res
+                    }
                     option = {
                         backgroundColor: '#565670',//地图背景色
-                        grid: {    //echarts地图距离容器位置
-                            left: '50%',
-                            top: '50%',
-                            containLabel: true,
+                        geo: {
+                            map: "china",
+                            roam: true,
+                            label: {
+                                normal: {
+                                    show: true,
+                                    textStyle: {
+                                        color: '#fff'
+                                    },
+                                    formatter: function (v) {
+                                        if (v.name && v.value) return v.name + v.value + '个'
+                                        else return ' '
+                                    }
+                                },
+                                emphasis: {//鼠标放上去时的状态
+                                    show: true,
+                                    textStyle: {
+                                        color: '#333'
+                                    }
+                                }
+                            },
+                            itemStyle: {
+                                normal: {
+                                    areaColor: '#d5d5d5',
+                                    borderColor: '#d5d5d5',
+                                    borderWidth: 0.5
+                                },
+                                emphasis: {
+                                    areaColor: '#a5a279'
+                                }
+                            }
                         },
                         series: [
                             {
                                 name: '大区',//城市
                                 type: 'map',
                                 map: 'china',
-                                geoIndex: 1,
+                                geoIndex: 0,
                                 symbolSize: 20,
                                 data: data,
                                 zoom: 1,
-                                layoutCenter: ["60%", "50%"],
-                                layoutSize: "70%",
                                 showLegendSymbol: true, // 存在legend时显示
                                 label: {
                                     normal: {
@@ -234,8 +402,8 @@
                                         textStyle: {
                                             color: '#fff'
                                         },
-                                        formatter:function(v){
-                                            if(v.name && v.value) return v.name+v.value+'个'
+                                        formatter: function (v) {
+                                            if (v.name && v.value) return v.name + v.value + '个'
                                             else return ' '
                                         }
                                     },
@@ -254,25 +422,57 @@
                                         borderWidth: 0.5
                                     },
                                     emphasis: {
-                                        areaColor: '#ffdf33'
+                                        areaColor: '#a5a279'
                                     }
                                 }
+                            },
+                            {
+                                name: 'label',
+                                type: 'scatter',
+                                coordinateSystem: 'geo',
+                                symbol: "pin",
+                                data: converData(data),
+                                symbolSize: function (val) {
+                                    return val[2]*8;
+                                },
+                                itemStyle: {
+                                    normal: {
+                                        color: "green", //标志颜色
+                                    },
+                                },
+                                emphasis: {
+                                    label: {
+                                        show: true
+                                    }
+                                },
+                                label: {
+                                    formatter: '{b}',
+                                    position: 'right',
+                                    show: true
+                                },
+                                showEffectOn: "render",
+                                rippleEffect: {
+                                    brushType: "stroke",
+                                },
+                                hoverAnimation: true,
+                                zlevel: 1,
                             }
                         ]
                     };
                     pRChart.setOption(option, true);
                 });
             }
-            
+
             // 地图点击事件
-            pRChart.on('click',param=>{
+            pRChart.on('click', param => {
                 const { name, componentType, componentSubType } = param
                 switch (componentType) {
                     case 'series':
                         const type = componentSubType
-                        switch (type){
+                        switch (type) {
                             case 'map':
-                                console.log(param);
+                                echarts.registerMap('china', cj)
+                                pRChart.setOption(option2, true);
                         }
                 }
             })
