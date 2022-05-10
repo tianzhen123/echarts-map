@@ -126,18 +126,19 @@
                     ]
                 },
             };
-            var mergeProvinces = function (chinaJson, names, properties) {//合并大区里省份的coordinates
+
+            var mergeProvinces = function (chinaJson, params) {//合并大区里省份的coordinates
                 let res = chinaJson
                 var features = chinaJson.features;
                 var polygons = [];
                 var polygons2 = [];
 
-                for (var i = 0; i < names.length; i++) {
+                for (var i = 0; i < params.length; i++) {
                     var polygonsCoordinates = [];
                     var polygonsEncodeOffsets = [];
-                    for (var z = 0; z < names[i].length; z++) {
+                    for (var z = 0; z < params[i].area.length; z++) {
                         for (var j = 0; j < features.length; j++) {
-                            if (features[j].properties.name == names[i][z]) {
+                            if (features[j].properties.name == params[i].area[z]) {
                                 if (features[j].geometry.coordinates[0].constructor == String) {//合并coordinates
                                     for (var l = 0; l < features[j].geometry.coordinates.length; l++) {
                                         polygonsCoordinates.push(features[j].geometry.coordinates[l]);
@@ -179,7 +180,7 @@
                 // 构建新的合并区域
                 var features = [];
 
-                for (var a = 0; a < names.length; a++) {
+                for (var a = 0; a < params.length; a++) {
                     var feature = {
                         id: features.length.toString(),
                         type: "FeatureCollection",
@@ -189,12 +190,12 @@
                             encodeOffsets: polygons2[a]
                         },
                         properties: {
-                            name: properties.name[a] || "",
+                            name: params[a].name || "",
                             childNum: polygons[a].length
                         }
                     };
-                    if (properties.cp[a]) {
-                        feature.properties.cp = properties.cp[a];
+                    if (params[a].cp) {
+                        feature.properties.cp = params[a].cp;
                     }
 
                     // 将新的合并区域添加到地图中
@@ -211,33 +212,48 @@
                 $.get('utils/china.json', function (chinaJson) {
                     cj = chinaJson;
                     let copyJson = JSON.parse(JSON.stringify(chinaJson))
-                    var params = {
-                        names: [//把各个大区的省份用二维数组分开
-                            ['北京', '天津', '河北', '山西', '内蒙古'],
-                            ["黑龙江", "吉林", "辽宁"],
-                            ['山东', '江苏', '安徽', '江西', '浙江', '福建', '上海'],
-                            ['河南', '湖北', '湖南'],
-                            ['广东', '广西', '海南', '香港', '澳门'],
-                            ['重庆', '四川', '云南', '西藏', '贵州', '新疆'],
-                            ['陕西', '甘肃', '青海', '宁夏'],
-                            ['台湾']
-                        ],
-                        properties: {//自定义大区的名字，要和上面的大区省份一一对应
-                            name: ['华北', '东北区域', '华东', '华中', '华南', '西南', '西北'],
-                            cp: [//经纬度可以自己随意定义
-                                [116.24, 39.54],
-                                [126.32, 43.50],
-                                [119.28, 31.13],
-                                [114.20, 30.32],
-                                [113.15, 23.08],
-                                [104.04, 29.39],
-                                [103.49, 36.03]
-                            ]
+                    let params = [
+                        {
+                            name: '华北',
+                            area: ['北京', '天津', '河北', '山西', '内蒙古'],
+                            cp:[116.24, 39.54]
+                        },
+                        {
+                            name: '东北区域',
+                            area: ["黑龙江", "吉林", "辽宁"],
+                            cp: [126.32, 43.50],
+                        },
+                        {
+                            name: '华东',
+                            area: ['山东', '江苏', '安徽', '江西', '浙江', '福建', '上海'],
+                            cp: [119.28, 31.13],
+                        },
+                        {
+                            name: '华中',
+                            area: ['河南', '湖北', '湖南'],
+                            cp: [114.20, 30.32],
+                        },
+                        {
+                            name:'华南',
+                            area:['广东', '广西', '海南', '香港', '澳门'],
+                            cp:  [113.15, 23.08],
+                        },
+                        {
+                            name: '西南',
+                            area: ['重庆', '四川', '云南', '西藏', '贵州', '新疆'],
+                            cp: [104.04, 29.39],
+                        },
+                        {
+                            name: '西北',
+                            area: ['陕西', '甘肃', '青海', '宁夏'],
+                            cp: [103.49, 36.03],
+                        },
+                        {
+                            name: '',
+                            area: ['台湾'],
                         }
-                    };
-
-                    let res = mergeProvinces(copyJson, params.names, params.properties);
-
+                    ]
+                    let res = mergeProvinces(copyJson, params)
                     echarts.registerMap('china', res); // 注册地图
 
 
