@@ -216,37 +216,44 @@
                         {
                             name: '华北',
                             area: ['北京', '天津', '河北', '山西', '内蒙古'],
-                            cp:[116.24, 39.54]
+                            cp: [116.24, 39.54],
+                            value: 2
                         },
                         {
                             name: '东北区域',
                             area: ["黑龙江", "吉林", "辽宁"],
                             cp: [126.32, 43.50],
+                            value: 5
                         },
                         {
                             name: '华东',
                             area: ['山东', '江苏', '安徽', '江西', '浙江', '福建', '上海'],
                             cp: [119.28, 31.13],
+                            value: 8
                         },
                         {
                             name: '华中',
                             area: ['河南', '湖北', '湖南'],
                             cp: [114.20, 30.32],
+                            value: 10
                         },
                         {
-                            name:'华南',
-                            area:['广东', '广西', '海南', '香港', '澳门'],
-                            cp:  [113.15, 23.08],
+                            name: '华南',
+                            area: ['广东', '广西', '海南', '香港', '澳门'],
+                            cp: [113.15, 23.08],
+                            value: 9
                         },
                         {
                             name: '西南',
                             area: ['重庆', '四川', '云南', '西藏', '贵州', '新疆'],
                             cp: [104.04, 29.39],
+                            value: 4
                         },
                         {
                             name: '西北',
                             area: ['陕西', '甘肃', '青海', '宁夏'],
                             cp: [103.49, 36.03],
+                            value: 6
                         },
                         {
                             name: '',
@@ -257,39 +264,17 @@
                     echarts.registerMap('china', res); // 注册地图
 
 
-                    var data = [//地图数据
-                        {
-                            "name": "华北",
-                            "value": 2,
-                        },
-                        {
-                            "name": "东北区域",
-                            "value": 100,
-                        },
-                        {
-                            "name": "华南",
-                            "value": 6,
-                        },
-                        {
-                            "name": "华东",
-                            "value": 7,
-                        },
-                        {
-                            "name": "华中",
-                            "value": 1,
-                        },
-                        {
-                            "name": "西南",
-                            "value": 8,
-                        },
-                        {
-                            "name": "西北",
-                            "value": 5,
-                        }
-                    ];
-                    function colorAreaObj (name, color, value) {
+                    var data = [];
+                    /**
+                     * /@name 区域名称
+                     * /@color 区域颜色
+                     * /@value 区域
+                     * 
+                     **/
+                    function colorAreaObj (name, color, value, cp) {
                         this.name = name;
                         this.value = value;
+                        this.cp = cp;
                         this.itemStyle = {
                             normal: {
                                 color: color,
@@ -309,61 +294,18 @@
                             },
                         };
                     }
-                    var colorAreaConfig = [//地图数据
-                        {
-                            "name": "东北区域",
-                            "color": '#e400ff',
-                            "value": 20,
-                        },
-                        {
-                            "name": "华北",
-                            "color": "rgba(47,144,236,1)",
-                            "value": 2,
-                        },
-                        {
-                            "name": "华南",
-                            "color": "#2525d7",
-                            "value": 6,
-                        },
-                        {
-                            "name": "华东",
-                            "color": "rgba(254,62,62,1)",
-                            "value": 7,
-                        },
-                        {
-                            "name": "华中",
-                            "color": "rgba(176,58,91,1)",
-                            "value": 1,
-                        },
-                        {
-                            "name": "西南",
-                            "color": "#ee9a00",
-                            "value": 8,
-                        },
-                        {
-                            "name": "西北",
-                            "color": "#a5a279",
-                            "value": 5,
-                        }
-                    ];
+                    var colorArray = ['#e400ff', "rgba(47,144,236,1)", "#2525d7", "rgba(254,62,62,1)", "rgba(176,58,91,1)", "#ee9a00", "#a5a279"];
 
-                    data = colorAreaConfig.map(function (v, i) {
-                        return new colorAreaObj(v.name, v.color, v.value);
+                    data = params.map(function (v, i) {
+                        return !!v.name && new colorAreaObj(v.name, colorArray[i], v.value, v.cp);
                     });
 
                     function converData (data) {
-                        let ing = [[116.24, 39.54],
-                        [126.32, 43.50],
-                        [119.28, 31.13],
-                        [114.20, 30.32],
-                        [113.15, 23.08],
-                        [104.04, 29.39],
-                        [103.49, 36.03]]
                         let res = []
-                        for (let i = 0; i < data.length; i++) {
+                        for (let i = 0; i < data.length - 1; i++) {
                             res.push({
                                 name: data[i].name,
-                                value: ing[i].concat(data[i].value)
+                                value: (data[i].cp).concat(data[i].value)
                             })
                         }
                         return res
@@ -395,12 +337,15 @@
                                 normal: {
                                     areaColor: '#d5d5d5',
                                     borderColor: '#d5d5d5',
-                                    borderWidth: 0.5
+                                    borderWidth: 0.5,
+                                    shadowBlur: 10,
                                 },
                                 emphasis: {
                                     areaColor: '#a5a279'
                                 }
-                            }
+                            },
+                            layoutCenter: ["60%", "50%"],
+                            layoutSize: "80%",
                         },
                         series: [
                             {
@@ -410,7 +355,6 @@
                                 geoIndex: 0,
                                 symbolSize: 20,
                                 data: data,
-                                zoom: 1,
                                 showLegendSymbol: true, // 存在legend时显示
                                 label: {
                                     normal: {
@@ -449,7 +393,7 @@
                                 symbol: "pin",
                                 data: converData(data),
                                 symbolSize: function (val) {
-                                    return val[2]*8;
+                                    return val[2] * 8;
                                 },
                                 itemStyle: {
                                     normal: {
@@ -464,7 +408,16 @@
                                 label: {
                                     formatter: '{b}',
                                     position: 'right',
-                                    show: true
+                                    show: true,
+                                    textStyle: {
+                                        color: "#fff",
+                                        fontSize: 16,
+                                    },
+                                },
+                                itemStyle: {
+                                    normal: {
+                                        color: "#D8BC37",
+                                    },
                                 },
                                 showEffectOn: "render",
                                 rippleEffect: {
@@ -472,6 +425,8 @@
                                 },
                                 hoverAnimation: true,
                                 zlevel: 1,
+                                layoutCenter: ['50%', '80%'], //属性定义地图中心在屏幕中的位置，一般结合layoutSize 定义地图的大小
+                                layoutSize: 230
                             }
                         ]
                     };
