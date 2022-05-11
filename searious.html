@@ -312,7 +312,7 @@
                             map: "china",
                             roam: true,
                             data: data,
-                            label: {
+                            label: { // 每个区域显示标题内容定制
                                 normal: {
                                     show: true,
                                     textStyle: {
@@ -321,7 +321,6 @@
                                     formatter: function (v) {
                                         let res;
                                         params.forEach(item=>{
-                                            console.log(item);
                                             if(item.name === v.name && item.value){
                                                 res = item.name + item.value + '个'
                                             }
@@ -332,7 +331,7 @@
                                 emphasis: {//鼠标放上去时的状态
                                     show: true,
                                     textStyle: {
-                                        color: '#333'
+                                        color: '#fff'
                                     }
                                 }
                             },
@@ -363,41 +362,28 @@
                                 coordinateSystem: 'geo',
                                 symbol: "pin",
                                 data: converData(data),
-                                symbolSize: function (val) {
+                                symbolSize: function (val) { // 控制气泡大小
                                     return val[2] * 8;
                                 },
-                                itemStyle: {
+                                label: { // 气泡内容控制
                                     normal: {
-                                        color: "green", //标志颜色
+                                        formatter: p => {
+                                            return p.value[2]
+                                        },
+                                        show: true,
+                                        textStyle: {
+                                            color: '#fff'
+                                        }
                                     },
-                                },
-                                emphasis: {
-                                    label: {
-                                        show: true
+                                    emphasis: {
+                                        show: false
                                     }
                                 },
-                                // label: {
-                                //     formatter: '{b}',
-                                //     position: 'right',
-                                //     show: true,
-                                //     textStyle: {
-                                //         color: "#fff",
-                                //         fontSize: 16,
-                                //     },
-                                // },
-                                itemStyle: {
+                                itemStyle: { // 气泡颜色
                                     normal: {
                                         color: "#D8BC37",
                                     },
                                 },
-                                showEffectOn: "render",
-                                rippleEffect: {
-                                    brushType: "stroke",
-                                },
-                                hoverAnimation: true,
-                                zlevel: 1,
-                                layoutCenter: ['50%', '80%'], //属性定义地图中心在屏幕中的位置，一般结合layoutSize 定义地图的大小
-                                layoutSize: 230
                             }
                         ]
                     };

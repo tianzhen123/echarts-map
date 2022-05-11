@@ -72,14 +72,46 @@
                             },
                         };
                     }
-
-                    let d2 = chinaJson.features.map(item => {
-                        let value = (Math.random() * 10).toFixed();
-                        return {
-                            name: item.properties.name,
-                            value: [item.properties.cp[0], item.properties.cp[1], value],
-                            cityCode: item.properties.adcode, // 地区级别
+                    // 某大区省份名称
+                    let areas = [
+                        {
+                            name: '北京',
+                            count: 10
+                        },
+                        {
+                            name: '天津',
+                            count: 5
+                        },
+                        {
+                            name: '河北',
+                            count: 8
+                        },
+                        {
+                            name: '山西',
+                            count: 8
+                        },
+                        {
+                            name: '内蒙古',
+                            count: 3
+                        },
+                    ]
+                    let d2 = [];
+                    chinaJson.features.forEach(item => {
+                        let res;
+                        areas.forEach(value => {
+                            if(value.name == item.properties.name){
+                                res = value
+                            }
+                        })
+                        if (res) {
+                            let value = res.count;
+                            d2.push({
+                                name: item.properties.name,
+                                value: [item.properties.cp[0], item.properties.cp[1], value],
+                                cityCode: item.properties.adcode, // 地区级别
+                            })
                         }
+
                     })
                     let data = d2.map((v) => {
                         return new colorAreaObj(v.name, v.value[2])
@@ -89,18 +121,18 @@
                         geo: {
                             map: "china",
                             roam: true,
-                            label: {
-                                emphasis: {//鼠标放上去时的状态
-                                    show: false,
+                            label: { // 地图label文案
+                                normal: {
+                                    show: true,
                                     textStyle: {
-                                        color: '#333'
-                                    }
-                                }
+                                        color: '#fff'
+                                    },
+                                },
                             },
                             itemStyle: {
                                 normal: {
                                     areaColor: '#d5d5d5',
-                                    borderColor: '#d5d5d5',
+                                    borderColor: '#333',
                                     borderWidth: 0.5
                                 },
                                 emphasis: {
@@ -117,19 +149,6 @@
                                 aspectScale: 0.75, //长宽比
                                 symbolSize: 20,
                                 data: data,
-                                showLegendSymbol: true, // 存在legend时显示
-                                roam: true,//禁止拖拽和伸缩
-                                itemStyle: {
-                                    normal: {
-                                        areaColor: '#d5d5d5',
-                                        borderColor: '#d5d5d5',
-                                        borderWidth: 0.5
-                                    },
-                                    emphasis: {
-                                        areaColor: '#2525d7'
-                                    }
-                                },
-
                             },
                             {
                                 name: 'label',
@@ -145,17 +164,11 @@
                                         color: "yellow", //标志颜色
                                     },
                                 },
-                                emphasis: {
-                                    label: {
-                                        show: true
-                                    }
-                                },
                                 label: {
                                     normal: {
                                         formatter: p => {
                                             return p.value[2]
                                         },
-                                        position: 'center', //地图上是否有文字
                                         show: true,
                                         textStyle: {
                                             color: '#fff'
