@@ -254,12 +254,12 @@
                             area: ['陕西', '甘肃', '青海', '宁夏'],
                             cp: [103.49, 36.03],
                             value: 6
-                        },
-                        {
-                            name: '',
-                            area: ['台湾'],
                         }
                     ]
+                    params.push({
+                        name: '',
+                        area: ['台湾'],
+                    })
                     let res = mergeProvinces(copyJson, params)
                     echarts.registerMap('china', res); // 注册地图
 
@@ -278,11 +278,7 @@
                         this.itemStyle = {
                             normal: {
                                 color: color,
-                                show: false,
-                            },
-                            emphasis: {
-                                color: color,
-                                show: false,
+                                show: true,
                             },
                         };
                         this.label = {
@@ -315,6 +311,7 @@
                         geo: {
                             map: "china",
                             roam: true,
+                            data: data,
                             label: {
                                 normal: {
                                     show: true,
@@ -322,8 +319,14 @@
                                         color: '#fff'
                                     },
                                     formatter: function (v) {
-                                        if (v.name && v.value) return v.name + v.value + '个'
-                                        else return ' '
+                                        let res;
+                                        params.forEach(item=>{
+                                            console.log(item);
+                                            if(item.name === v.name && item.value){
+                                                res = item.name + item.value + '个'
+                                            }
+                                        })
+                                        return res && res
                                     }
                                 },
                                 emphasis: {//鼠标放上去时的状态
@@ -340,9 +343,6 @@
                                     borderWidth: 0.5,
                                     shadowBlur: 10,
                                 },
-                                emphasis: {
-                                    areaColor: '#a5a279'
-                                }
                             },
                             layoutCenter: ["60%", "50%"],
                             layoutSize: "80%",
@@ -355,36 +355,7 @@
                                 geoIndex: 0,
                                 symbolSize: 20,
                                 data: data,
-                                showLegendSymbol: true, // 存在legend时显示
-                                label: {
-                                    normal: {
-                                        show: true,
-                                        textStyle: {
-                                            color: '#fff'
-                                        },
-                                        formatter: function (v) {
-                                            if (v.name && v.value) return v.name + v.value + '个'
-                                            else return ' '
-                                        }
-                                    },
-                                    emphasis: {//鼠标放上去时的状态
-                                        show: true,
-                                        textStyle: {
-                                            color: '#333'
-                                        }
-                                    }
-                                },
                                 roam: true,//禁止拖拽和伸缩
-                                itemStyle: {
-                                    normal: {
-                                        areaColor: '#d5d5d5',
-                                        borderColor: '#d5d5d5',
-                                        borderWidth: 0.5
-                                    },
-                                    emphasis: {
-                                        areaColor: '#a5a279'
-                                    }
-                                }
                             },
                             {
                                 name: 'label',
@@ -405,15 +376,15 @@
                                         show: true
                                     }
                                 },
-                                label: {
-                                    formatter: '{b}',
-                                    position: 'right',
-                                    show: true,
-                                    textStyle: {
-                                        color: "#fff",
-                                        fontSize: 16,
-                                    },
-                                },
+                                // label: {
+                                //     formatter: '{b}',
+                                //     position: 'right',
+                                //     show: true,
+                                //     textStyle: {
+                                //         color: "#fff",
+                                //         fontSize: 16,
+                                //     },
+                                // },
                                 itemStyle: {
                                     normal: {
                                         color: "#D8BC37",
