@@ -306,8 +306,22 @@
                         }
                         return res
                     }
+                    let mapData = chinaJson.features.map(item => {
+                        let value = (Math.random() * 10).toFixed();
+                        if (value < 5) {
+                            value = 5
+                        }
+                        return {
+                            name: item.properties.name,
+                            value: [item.properties.cp[0], item.properties.cp[1], value],
+                            cityCode: item.properties.adcode
+                        }
+                    })
                     option = {
                         backgroundColor: '#565670',//地图背景色
+                        tooltip: {
+                            trigger: 'item'
+                        },
                         geo: {
                             map: "china",
                             roam: true,
@@ -320,8 +334,8 @@
                                     },
                                     formatter: function (v) {
                                         let res;
-                                        params.forEach(item=>{
-                                            if(item.name === v.name && item.value){
+                                        params.forEach(item => {
+                                            if (item.name === v.name && item.value) {
                                                 res = item.name + item.value + '个'
                                             }
                                         })
@@ -355,30 +369,40 @@
                                 symbolSize: 20,
                                 data: data,
                                 roam: true,//禁止拖拽和伸缩
+                                tooltip: {
+                                    show: false,
+                                },
                             },
                             {
                                 name: 'label',
                                 type: 'scatter',
                                 coordinateSystem: 'geo',
                                 symbol: "pin",
-                                data: converData(data),
+                                data: mapData,
                                 symbolSize: function (val) { // 控制气泡大小
                                     return val[2] * 8;
                                 },
-                                label: { // 气泡内容控制
-                                    normal: {
-                                        formatter: p => {
-                                            return p.value[2]
-                                        },
-                                        show: true,
-                                        textStyle: {
-                                            color: '#fff'
-                                        }
-                                    },
-                                    emphasis: {
-                                        show: false
+                                tooltip: { 
+                                    formatter: p => {
+                                        let val = p.value[2]
+                                        let txtCon = p.name + '：' + val
+                                        return txtCon
                                     }
                                 },
+                                // label: { // 气泡内容控制
+                                //     normal: {
+                                //         formatter: p => {
+                                //             return p.name + p.value[2]
+                                //         },
+                                //         show: true,
+                                //         textStyle: {
+                                //             color: '#fff'
+                                //         }
+                                //     },
+                                //     emphasis: {
+                                //         show: false
+                                //     }
+                                // },
                                 itemStyle: { // 气泡颜色
                                     normal: {
                                         color: "#D8BC37",
