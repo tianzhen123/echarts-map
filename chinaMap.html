@@ -43,14 +43,14 @@
 
                     echarts.registerMap('china', chinaJson); // 注册地图
                     var pRChart = echarts.init(document.getElementById('echartsMapBox'));
-                    function colorAreaObj (name, value) {
-                        this.name = name; let color;
-                        if (value > 0 && value <= 3) {
-                            color = '#d7d7d7'
-                        } else if (value > 3 && value <= 6) {
-                            color = '#a5a5a5'
-                        } else {
+                    function colorAreaObj (name, value, isInside) {
+                        this.name = name; 
+                        // 根据是否属于当前大区，显示不同颜色
+                        let color;
+                        if (isInside) {
                             color = '#0a9515'
+                        } else{
+                            color = '#a5a5a5'
                         }
                         this.value = value;
                         this.itemStyle = {
@@ -76,23 +76,28 @@
                     let areas = [
                         {
                             name: '北京',
-                            count: 10
+                            value: 10,
+                            isInside: true, // 是否属于当前大区
                         },
                         {
                             name: '天津',
-                            count: 5
+                            value: 5,
+                            isInside: true
                         },
                         {
                             name: '河北',
-                            count: 8
+                            value: 8,
+                            isInside: true
                         },
                         {
                             name: '山西',
-                            count: 8
+                            value: 8,
+                            isInside: false
                         },
                         {
                             name: '内蒙古',
-                            count: 3
+                            value: 3,
+                            isInside: true
                         },
                     ]
                     let d2 = [];
@@ -104,17 +109,16 @@
                             }
                         })
                         if (res) {
-                            let value = res.count;
                             d2.push({
                                 name: item.properties.name,
-                                value: [item.properties.cp[0], item.properties.cp[1], value],
+                                value: [item.properties.cp[0], item.properties.cp[1], res.value],
                                 cityCode: item.properties.adcode, // 地区级别
+                                isInside: res.isInside,
                             })
                         }
-
                     })
                     let data = d2.map((v) => {
-                        return new colorAreaObj(v.name, v.value[2])
+                        return new colorAreaObj(v.name, v.value[2],v.isInside)
                     })
                     option = {
                         backgroundColor: '#565670',//地图背景色
