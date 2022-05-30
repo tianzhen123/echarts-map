@@ -216,7 +216,7 @@
                         {
                             name: '华北',
                             area: ['北京', '天津', '河北', '山西', '内蒙古'],
-                            cp: [116.24, 39.54],
+                            cp: [116.24, 39.54], // 地图上label显示的坐标位置，可能需要前端写死
                             value: 2
                         },
                         {
@@ -307,7 +307,7 @@
                         return res
                     }
                     let mapData = chinaJson.features.map(item => {
-                        let value = (Math.random() * 10).toFixed();
+                        let value = (Math.random() * 10).toFixed();  // 此处要根据后端初回的省份数据显示，现在是模拟数据
                         if (value < 5) {
                             value = 5
                         }
